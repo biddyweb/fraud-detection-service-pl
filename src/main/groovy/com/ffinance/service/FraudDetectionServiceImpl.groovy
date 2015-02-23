@@ -39,7 +39,7 @@ class FraudDetectionServiceImpl implements FraudDetectionService {
         return JobPosition.FINANCE_SECTOR.getName().equalsIgnoreCase(client.job) ||
                 isClientTooOld(client) ||
                 isLoanAmountFishy(client) ||    
-                isClientNameTooLong(client.firstName, client.lastName)
+                isClientNameTooLong(client)
     }
 
 
@@ -75,18 +75,16 @@ class FraudDetectionServiceImpl implements FraudDetectionService {
     }
 
     boolean isClientNameTooShort(Client client) {
-        client.firstName.length() < 2 ||
-                client.lastName() < 2
+        client.firstName.length() < 2 || client.lastName.length() < 2
     }
 
     boolean isClientNameTooLong(Client client) {
-        client.firstName.length() > 25 ||
-                client.lastName() > 25
+        client.firstName.length() > 25 || client.lastName.length() > 25
     }
 
     boolean isClientNameOk(Client client) {
-        (client.firstName >= MIN_NAME_LENGTH && client.firstName <= MAX_NAME_LENGTH) ||
-                (client.lastName >= MIN_NAME_LENGTH && client.lastName <= MAX_NAME_LENGTH)
+        (client.firstName.length() >= MIN_NAME_LENGTH && client.firstName.length() <= MAX_NAME_LENGTH) ||
+                (client.lastName.length() >= MIN_NAME_LENGTH && client.lastName.length() <= MAX_NAME_LENGTH)
     }
 
 }
