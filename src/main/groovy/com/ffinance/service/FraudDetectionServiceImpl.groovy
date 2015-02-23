@@ -18,63 +18,75 @@ class FraudDetectionServiceImpl implements FraudDetectionService {
     @Override
     ClientFraudStatus checkClientFraudStatus(Client client) {
         final ClientFraudStatus status
-        if(isClientFraud(loanApplication)) {
-            status = FraudStatus.FRAUD
-        } else if(isClientFishy(loanApplication)) {
-            status = FraudStatus.FISHY
-        } else if(isClientOK(loanApplication)) {
-            status = FraudStatus.OK
+        if(isClientFraud(client)) {
+            status = ClientFraudStatus.FRAUD
+        } else if(isClientFishy(client)) {
+            status = ClientFraudStatus.FISHY
+        } else if(isClientOK(client)) {
+            status = ClientFraudStatus.GOOD
         }
         return status
     }
 
     boolean isClientFraud(Client client) {
-        return JobPosition.OTHER.getName().equalsIgnoreCase(client.job) &&
-                client.age < MIN_AGE &&
-                isAmountGreaterThanSecondThreshold(client) &&
+        return JobPosition.OTHER.getName().equalsIgnoreCase(client.job) ||
+                isClientTooYoung(client) ||
+                isLoanAmountTooHigh(client) ||
                 isClientNameTooShort(client)
     }
 
     boolean isClientFishy(Client client) {
-        return JobPosition.FINANCE_SECTOR.getName().equalsIgnoreCase(client.job) &&
-                client.age > MAX_AGE &&
-                isAmountBetweenThresholds(client) &&
+        return JobPosition.FINANCE_SECTOR.getName().equalsIgnoreCase(client.job) ||
+                isClientTooOld(client) ||
+                isLoanAmountFishy(client) ||    
                 isClientNameTooLong(client.firstName, client.lastName)
     }
 
+
     boolean isClientOK(Client client) {
-        return JobPosition.IT.getName().equalsIgnoreCase(client.job) &&
-                client.age > MIN_AGE &&
-                client.age < MAX_AGE &&
-                isAmountLessThanFirstThreshold(client) &&
+        return JobPosition.IT.getName().equalsIgnoreCase(client.job) ||
+                isClientWithIdealAge(client) ||
+                isLoanAmountOk(client) ||
                 isClientNameOk(client)
     }
 
-    boolean isAmountGreaterThanSecondThreshold(Client client) {
-        return client.amount > SECOND_THRESHOLD
+    private boolean isClientTooYoung(Client client) {
+        client.age < MIN_AGE
     }
 
-    boolean isAmountBetweenThresholds(Client client) {
-        return client.amount > FIRST_THRESHOLD && client.amount < SECOND_THRESHOLD
+    private boolean isClientTooOld(Client client) {
+        client.age > MAX_AGE
+    }
+    
+    private boolean isClientWithIdealAge(Client client) {
+        client.age >= MIN_AGE && client.age <= MAX_AGE
+    }
+
+    boolean isLoanAmountOk(Client client) {
+        client.amount > FIRST_THRESHOLD
+    }
+    
+    boolean isLoanAmountTooHigh(Client client) {
+        client.amount > SECOND_THRESHOLD
+    }
+
+    boolean isLoanAmountFishy(Client client) {
+        client.amount >= FIRST_THRESHOLD && client.amount <= SECOND_THRESHOLD
     }
 
     boolean isClientNameTooShort(Client client) {
-        return client.firstName.length() < 2 ||
+        client.firstName.length() < 2 ||
                 client.lastName() < 2
     }
 
     boolean isClientNameTooLong(Client client) {
-        return client.firstName.length() > 25 ||
-                client.lastName() < 25
-    }
-
-    boolean isAmountLessThanFirstThreshold(Client client) {
-        return client.amount < FIRST_THRESHOLD
+        client.firstName.length() > 25 ||
+                client.lastName() > 25
     }
 
     boolean isClientNameOk(Client client) {
-        return (client.firstName > MIN_NAME_LENGTH && client.firstName < MAX_NAME_LENGTH) ||
-                (client.lastName > MIN_NAME_LENGTH && client.lastName < MAX_NAME_LENGTH)
+        (client.firstName >= MIN_NAME_LENGTH && client.firstName <= MAX_NAME_LENGTH) ||
+                (client.lastName >= MIN_NAME_LENGTH && client.lastName <= MAX_NAME_LENGTH)
     }
 
 }
