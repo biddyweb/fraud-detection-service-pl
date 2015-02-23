@@ -32,7 +32,7 @@ ext {
     projectGroupId = groupId
 
     jacksonMapper = '1.9.13'
-    contractsDir = file("${project.rootDir}/repository/mappings/com/ofg/twitter-places-analyzer")
+    contractsDir = file("${project.rootDir}/repository/mappings/pl/fraud-detection-service-pl")
     wiremockStubsOutputDirRoot = file("${project.rootDir}/out/production/${project.name}-stubs/")
     wiremockStubsOutputDir = new File(wiremockStubsOutputDirRoot, 'repository/mappings/')
     wiremockStubsOutputDir.mkdirs()
