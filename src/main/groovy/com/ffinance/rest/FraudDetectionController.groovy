@@ -51,9 +51,7 @@ class FraudDetectionController {
                     .body(client)
                     .withHeaders()
                     .contentTypeJson()
-                    .andExecuteFor()
+                    .andExecuteFor().ignoringResponse()
         }
     }
-
-
 }
