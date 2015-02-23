@@ -43,20 +43,15 @@ class FraudDetectionController {
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Async collecting loan application to verify", notes = "This will asynchronously call LoanApplicationDecisionMaker")
     Callable<Void> notify(@PathVariable @NotNull final long loanApplicationId,  @RequestBody @NotNull final Client client) {
-        return {
-            ->
-            
-            client.fraudStatus = fraudDetectionService.checkClientFraudStatus(client)
-
+        return { ->
+            client.fraudStatus = fraudDetectionService.checkClientFraudStatus(client).name()
             serviceRestClient.forService(Collaborators.LOAN_APPLICATION_DECISION_MAKER)
                     .put()
                     .onUrlFromTemplate("/api/loanApplication/{loanApplicationId}").withVariables(loanApplicationId)
                     .body(client)
                     .withHeaders()
-                        .contentTypeJson()
+                    .contentTypeJson()
                     .andExecuteFor()
-
-            null
         }
     }
 
