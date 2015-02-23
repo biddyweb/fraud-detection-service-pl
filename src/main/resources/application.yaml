@@ -1,3 +1,4 @@
+
 spring:
   jackson.deserialization.fail-on-unknown-properties: false
   groovy.template.check-template-location: false
@@ -5,12 +6,17 @@ spring:
 rest.api.version: 1.0
 city.finding.service.url: "http://api.openweathermap.org/data/2.5/weather"
 
+graphite:
+  host: graphite.hackathon.dev.4finance.net
+
 metrics.path:
   country: pl
-  app: service-name
+  app: fraud-detection-service-pl
 
 stubrunner.stubs:
-  repository.root: "http://dl.bintray.com/4finance/micro"
+  repository.root: "http://nexus.hackathon.dev.4finance.net/nexus/nexus/content/repositories/releases/"
   group: com.ofg
-  module: stub-runner-examples
+  module: stub-definitions
 
+server:
+  port: 8053
