@@ -14,7 +14,7 @@ metrics.path:
   app: fraud-detection-service-pl
 
 stubrunner.stubs:
-  repository.root: "http://nexus.hackathon.dev.4finance.net/nexus/nexus/content/repositories/releases/"
+  repository.root: "http://nexus.hackathon.dev.4finance.net/nexus/content/repositories/releases/"
   group: com.ofg
   module: stub-definitions
 
