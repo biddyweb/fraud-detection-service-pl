@@ -1,9 +1,8 @@
 package com.ffinance.rest
-
-import com.ffinance.model.FraudIncomingMsg
-import com.ffinance.model.FraudOutgoingMsg
-import com.ofg.infrastructure.web.resttemplate.fluent.ServiceRestClient
 import com.ffinance.Collaborators
+import com.ffinance.model.Client
+import com.ffinance.service.FraudDetectionService
+import com.ofg.infrastructure.web.resttemplate.fluent.ServiceRestClient
 import com.wordnik.swagger.annotations.Api
 import com.wordnik.swagger.annotations.ApiOperation
 import groovy.transform.CompileStatic
@@ -30,6 +29,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT
 class FraudDetectionController {
 
     private final ServiceRestClient serviceRestClient;
+    
+    private final FraudDetectionService fraudDetectionService;
 
     @Autowired
     FraudDetectionController(ServiceRestClient serviceRestClient) {
@@ -41,24 +42,16 @@ class FraudDetectionController {
             method = PUT,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Async collecting loan application to verify", notes = "This will asynchronously call LoanApplicationDecisionMaker")
-    Callable<Void> notify(@PathVariable @NotNull final long loanApplicationId,  @RequestBody @NotNull final FraudIncomingMsg incomingMsg) {
+    Callable<Void> notify(@PathVariable @NotNull final long loanApplicationId,  @RequestBody @NotNull final Client client) {
         return {
             ->
-
-            def fraudOutgoingMsg = new FraudOutgoingMsg()
-            fraudOutgoingMsg.firstName = incomingMsg.firstName
-            fraudOutgoingMsg.lastName = incomingMsg.lastName
-            fraudOutgoingMsg.job = incomingMsg.job
-            fraudOutgoingMsg.amount = incomingMsg.amount
-            fraudOutgoingMsg.age = incomingMsg.age
-            fraudOutgoingMsg.fraudStatus = "REJECTED"
-
-            // LOGICA
+            
+            client.fraudStatus = fraudDetectionService.checkClientFraudStatus(client)
 
             serviceRestClient.forService(Collaborators.LOAN_APPLICATION_DECISION_MAKER)
                     .put()
                     .onUrlFromTemplate("/api/loanApplication/{loanApplicationId}").withVariables(loanApplicationId)
-                    .body(fraudOutgoingMsg)
+                    .body(client)
                     .withHeaders()
                         .contentTypeJson()
                     .andExecuteFor()
