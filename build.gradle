@@ -203,6 +203,8 @@ bootRepackage {
 //Make sure that fat jar is built before uploading
 project.tasks.findAll { it.name.startsWith('publish') || it.name == 'bintrayUpload' }*.dependsOn { bootRepackage }
 
+version=currentVersion
+
 publishing {
     repositories {
         maven {
@@ -215,12 +217,12 @@ publishing {
     }
     publications {
         stubs(MavenPublication) {
-            groupId projectGroupId
+            groupId='com.ofg'
             artifactId "${project.name}-stubs"
             artifact stubsJar
         }
         mavenJava(MavenPublication) {
-            groupId projectGroupId
+            groupId='com.ofg'
             from components.java
             pom.withXml {
                 //Remove dependencies - everything is embedded in JAR created by Spring Boot
