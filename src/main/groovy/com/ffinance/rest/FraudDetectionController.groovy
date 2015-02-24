@@ -1,7 +1,7 @@
 package com.ffinance.rest
 import com.ffinance.Collaborators
 import com.ffinance.model.Client
-import com.ffinance.model.ClientFraudStatus
+import com.ffinance.model.ValidatedClient
 import com.ffinance.service.FraudDetectionService
 import com.ofg.infrastructure.web.resttemplate.fluent.ServiceRestClient
 import com.wordnik.swagger.annotations.Api
@@ -47,11 +47,12 @@ class FraudDetectionController {
     Callable<Void> notify(@PathVariable @NotNull final long loanApplicationId,  @RequestBody @NotNull final Client client) {
         return { ->
             def status = fraudDetectionService.checkClientFraudStatus(client)
-            client.fraudStatus = status.name()
+            ValidatedClient validatedClient = new ValidatedClient(client)
+            validatedClient.fraudStatus = status.name()
             serviceRestClient.forService(Collaborators.LOAN_APPLICATION_DECISION_MAKER)
                     .put()
                     .onUrlFromTemplate("/api/loanApplication/{loanApplicationId}").withVariables(loanApplicationId)
-                    .body(client)
+                    .body(validatedClient)
                     .withHeaders()
                     .contentTypeJson()
                     .andExecuteFor().ignoringResponse()

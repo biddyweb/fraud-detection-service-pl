@@ -7,6 +7,5 @@ class Client {
     String job
     BigDecimal amount
     Integer age
-    String fraudStatus
     
 }
