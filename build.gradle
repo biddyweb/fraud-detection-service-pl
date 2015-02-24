@@ -216,14 +216,13 @@ publishing {
         }
     }
     publications {
-        stubs(MavenPublication) {
-            groupId='com.ofg'
-            artifactId "fraud-detection-service-pl-stubs"
-            artifact stubsJar
-        }
+//        stubs(MavenPublication) {
+//            groupId='com.ofg'
+//            artifactId "${project.name}-stubs"
+//            artifact stubsJar
+//        }
         mavenJava(MavenPublication) {
             groupId='com.ofg'
-            artifactId "fraud-detection-service-pl"
             from components.java
             pom.withXml {
                 //Remove dependencies - everything is embedded in JAR created by Spring Boot
