@@ -1,6 +1,7 @@
 package com.ffinance.rest
 import com.ffinance.Collaborators
 import com.ffinance.model.Client
+import com.ffinance.model.ClientFraudStatus
 import com.ffinance.service.FraudDetectionService
 import com.ofg.infrastructure.web.resttemplate.fluent.ServiceRestClient
 import com.wordnik.swagger.annotations.Api
@@ -33,8 +34,9 @@ class FraudDetectionController {
     private final FraudDetectionService fraudDetectionService;
 
     @Autowired
-    FraudDetectionController(ServiceRestClient serviceRestClient) {
+    FraudDetectionController(ServiceRestClient serviceRestClient, FraudDetectionService fraudDetectionService) {
         this.serviceRestClient = serviceRestClient
+        this.fraudDetectionService = fraudDetectionService
     }
 
     @RequestMapping(
@@ -44,7 +46,8 @@ class FraudDetectionController {
     @ApiOperation(value = "Async collecting loan application to verify", notes = "This will asynchronously call LoanApplicationDecisionMaker")
     Callable<Void> notify(@PathVariable @NotNull final long loanApplicationId,  @RequestBody @NotNull final Client client) {
         return { ->
-            client.fraudStatus = fraudDetectionService.checkClientFraudStatus(client).name()
+            def status = fraudDetectionService.checkClientFraudStatus(client)
+            client.fraudStatus = status.name()
             serviceRestClient.forService(Collaborators.LOAN_APPLICATION_DECISION_MAKER)
                     .put()
                     .onUrlFromTemplate("/api/loanApplication/{loanApplicationId}").withVariables(loanApplicationId)
